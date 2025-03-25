@@ -24,3 +24,4 @@
  "Show Notifications" will display a Windows notification with the outcome of the action; it includes the song title and artist(s) as well. This is also disabled by default.
 
 
+# The Spotify desktop and web players don't always update right away. If you receive a success sound or notification, it worked.
