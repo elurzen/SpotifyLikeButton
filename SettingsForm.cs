@@ -274,18 +274,6 @@ namespace SpotifyLikeButton
             string startupFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
             string shortcutPath = Path.Combine(startupFolderPath, "SpotifyLikeButton.lnk");
 
-            //// Create a shortcut using .NET methods
-            //using (StreamWriter writer = new StreamWriter(shortcutPath, false, Encoding.Unicode))
-            //{
-            //    string shortcutContent = $@"[InternetShortcut]
-            //        URL=file:///{System.Windows.Forms.Application.ExecutablePath.Replace("\\", "/")}
-            //        WorkingDirectory={System.Windows.Forms.Application.StartupPath}
-            //        IconIndex=0
-            //        IconFile={System.Windows.Forms.Application.ExecutablePath}
-            //        ";
-            //    writer.Write(shortcutContent);
-            //}
-
             Type t = Type.GetTypeFromCLSID(new Guid("72C24DD5-D70A-438B-8A42-98424B88AFB8")); //Windows Script Host Shell Object
             dynamic shell = Activator.CreateInstance(t);
             try
