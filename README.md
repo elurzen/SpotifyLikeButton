@@ -15,7 +15,7 @@
 
  If you choose to edit these keys, you can press any combination of Ctrl, Alt, and Shift (or none of them) plus a trigger key. When you press your trigger key the combination will automatically save. 
 
- The 3 sound drop downs in the middle can be previewed with the play button next to them. These sounds will play when Spotify confirms it completed the action successfully, if it fails, you'll receive the error sound. These can be set to <NONE> if you don't want any sound indication.
+ The 3 sound drop downs in the middle can be previewed with the play button next to them. These sounds will play when Spotify confirms it completed the action successfully, if it fails, you'll receive the error sound. These can be set to < NONE > if you don't want any sound indication.
 
  You can add custom sounds by adding .wav files to the "NotificationSounds" folder and they will appear in the dropdowns the next time you open the settings menu.
  
