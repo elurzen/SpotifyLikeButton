@@ -17,6 +17,8 @@ namespace SpotifyLikeButton
 
         public SpotifyPkceAuth(string clientId, string redirectUri, string scope)
         {
+            LogManager.WriteLog($"Init SpotifyPkceAuth ({clientId}, {redirectUri}, {scope})");
+
             _clientId = clientId;
             _redirectUri = redirectUri;
             _scope = scope;
@@ -34,6 +36,7 @@ namespace SpotifyLikeButton
         /// </summary>
         private string GenerateCodeVerifier(int length)
         {
+            LogManager.WriteLog("Enter GenerateCodeVerifier");
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
             var random = new Random();
             var result = new StringBuilder(length);
@@ -43,6 +46,7 @@ namespace SpotifyLikeButton
                 result.Append(chars[random.Next(chars.Length)]);
             }
 
+            LogManager.WriteLog("Exit GenerateCodeVerifier");
             return result.ToString();
         }
 
@@ -51,9 +55,11 @@ namespace SpotifyLikeButton
         /// </summary>
         private string GenerateCodeChallenge(string codeVerifier)
         {
+            LogManager.WriteLog("Enter GenerateCodeChallenge");
             using var sha256 = SHA256.Create();
             var challengeBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(codeVerifier));
 
+            LogManager.WriteLog("Exit GenerateCodeChallenge");
             // Convert to Base64URL encoding (Base64 with URL-safe characters)
             return Convert.ToBase64String(challengeBytes)
                 .Replace('+', '-')
@@ -66,6 +72,7 @@ namespace SpotifyLikeButton
         /// </summary>
         public string GetAuthorizationUrl()
         {
+            LogManager.WriteLog("Enter GetAuthorizationUrl");
             var queryParams = HttpUtility.ParseQueryString(string.Empty);
             queryParams["response_type"] = "code";
             queryParams["client_id"] = _clientId;
@@ -79,6 +86,7 @@ namespace SpotifyLikeButton
                 Query = queryParams.ToString()
             };
 
+            LogManager.WriteLog("Exit GetAuthorizationUrl");
             return uriBuilder.ToString();
         }
 
@@ -87,25 +95,28 @@ namespace SpotifyLikeButton
         /// </summary>
         public async Task<SpotifyTokenResponse> RequestAccessTokenAsync(string code)
         {
+            LogManager.WriteLog("Enter RequestAccessTokenAsync");
             using var httpClient = new HttpClient();
 
             var requestBody = new FormUrlEncodedContent(new[]
             {
-            new KeyValuePair<string, string>("client_id", _clientId),
-            new KeyValuePair<string, string>("grant_type", "authorization_code"),
-            new KeyValuePair<string, string>("code", code),
-            new KeyValuePair<string, string>("redirect_uri", _redirectUri),
-            new KeyValuePair<string, string>("code_verifier", _codeVerifier)
-        });
+                new KeyValuePair<string, string>("client_id", _clientId),
+                new KeyValuePair<string, string>("grant_type", "authorization_code"),
+                new KeyValuePair<string, string>("code", code),
+                new KeyValuePair<string, string>("redirect_uri", _redirectUri),
+                new KeyValuePair<string, string>("code_verifier", _codeVerifier)
+            });
 
             var response = await httpClient.PostAsync("https://accounts.spotify.com/api/token", requestBody);
             var content = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
             {
+                LogManager.WriteLog($"Error requesting access token: {content}");
                 throw new Exception($"Error requesting access token: {content}");
             }
 
+            LogManager.WriteLog("Exit RequestAccessTokenAsync");
             // You might want to use a proper JSON deserializer like Newtonsoft.Json or System.Text.Json here
             // This is a simplified version that assumes the response parsing succeeds
             return System.Text.Json.JsonSerializer.Deserialize<SpotifyTokenResponse>(content);

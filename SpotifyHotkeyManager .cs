@@ -84,7 +84,10 @@ public class SpotifyHotkeyManager : IDisposable
         _proc = HookCallback;
         _hookId = SetHook(_proc);
 
-        //Debug.WriteLine("Hotkey manager initialized.");
+        LogManager.WriteLog("Hotkey Manager Initialized");
+        LogManager.WriteLog($"Access Token: {_accessToken}");
+        LogManager.WriteLog($"New token expiration time: {_tokenExpirationTime}");
+        LogManager.WriteLog($"Refresh Token: {_refreshToken}");
     }
 
     public void Dispose()
@@ -167,13 +170,17 @@ public class SpotifyHotkeyManager : IDisposable
 
     public void PlaySound (string soundFile)
     {
+        LogManager.WriteLog($"Enter PlaySound - File: {soundFile}");
         if (!string.IsNullOrEmpty(soundFile) && File.Exists(soundFile))
         {
+            LogManager.WriteLog("Found Sound File");
             using (var soundPLayer = new SoundPlayer(soundFile))
             {
+                LogManager.WriteLog("Playing Sound");
                 soundPLayer.Play();
             }
         }
+        LogManager.WriteLog("Exit PlaySound");
     }
 
     private IntPtr SetHook(KeyboardHookProc proc)
@@ -210,21 +217,24 @@ public class SpotifyHotkeyManager : IDisposable
                 _shiftKeyDown = true;
             }
 
-            // Check if Ctrl+Plus is pressed
+            // Check if "Like" hotkey is pressed
             if (hookStruct.vkCode == _likeSongKeyCode &&
                     _ctrlKeyDown == _likeSongUseCtrl &&
                     _shiftKeyDown == _likeSongUseShift &&
                     _altKeyDown == _likeSongUseAlt)
             {
+                LogManager.WriteLog("Like Hotkey Pressed");
                 _ = SaveTrackAsync();
                 return CallNextHookEx(_hookId, nCode, wParam, lParam);
             }
 
+            // Check if "Unlike" hotkey is pressed
             if (hookStruct.vkCode == _unlikeSongKeyCode &&
                     _ctrlKeyDown == _unlikeSongUseCtrl &&
                     _shiftKeyDown == _unlikeSongUseShift &&
                     _altKeyDown == _unlikeSongUseAlt)
             {
+                LogManager.WriteLog("Unlike Hotkey Pressed");
                 _ = RemoveTrackAsync();
                 return CallNextHookEx(_hookId, nCode, wParam, lParam);
             }
@@ -255,6 +265,8 @@ public class SpotifyHotkeyManager : IDisposable
     {
         try
         {
+            LogManager.WriteLog("Enter GetCurrentlyPlayingTrack");
+
             await RefreshTokenIfNeededAsync();
 
             using (var httpClient = new HttpClient())
@@ -267,6 +279,7 @@ public class SpotifyHotkeyManager : IDisposable
 
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
+                    LogManager.WriteLog("Unauthorized, refreshing token");
                     await RefreshAccessTokenAsync();
 
                     // Retry with new token
@@ -288,6 +301,11 @@ public class SpotifyHotkeyManager : IDisposable
                             string trackId = currentlyPlaying.item.id;
                             string trackName = currentlyPlaying.item.name;
                             string artistNames = string.Join(", ", currentlyPlaying.item.artists.ConvertAll(a => a.name));
+
+                            LogManager.WriteLog($"Track ID: {trackId}");
+                            LogManager.WriteLog($"Track Name: {trackName}");
+                            LogManager.WriteLog($"Artist Names: {artistNames}");
+
                             return new CurrentlyPlayingTrack(trackId, trackName, artistNames);
                         }
                     }
@@ -296,12 +314,13 @@ public class SpotifyHotkeyManager : IDisposable
         }
         catch (Exception ex)
         {
-            //Debug.WriteLine($"Error: {ex.Message}");
+            LogManager.WriteLog($"Error: {ex.Message}");
             if (ex.InnerException != null)
             {
-                //Debug.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+                LogManager.WriteLog($"Inner Exception: {ex.InnerException.Message}");
             }
         }
+        LogManager.WriteLog("Exit GetCurrentlyPlayingTrack");
         return null;
     }
 
@@ -309,11 +328,14 @@ public class SpotifyHotkeyManager : IDisposable
     {
         try
         {
+            LogManager.WriteLog("Enter SaveTrackAsync");
+
             var track = await GetCurrentlyPlayingTrack();
             if (track == null)
             {
                 ShowNotification("Oops!", "No track is currently playing.");
                 PlaySound(_ErrorSound);
+                LogManager.WriteLog("track returned null");
                 return;
             }
 
@@ -327,6 +349,7 @@ public class SpotifyHotkeyManager : IDisposable
 
                 if (saveResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
+                    LogManager.WriteLog("Unauthorized, refreshing token");
                     await RefreshAccessTokenAsync();
                     httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
                     saveResponse = await httpClient.PutAsync($"https://api.spotify.com/v1/me/tracks?ids={track.trackId}", null);
@@ -340,35 +363,40 @@ public class SpotifyHotkeyManager : IDisposable
                 }
                 else
                 {
-                    //Debug.WriteLine($"Failed to save track. Status code: {saveResponse.StatusCode}");
                     ShowNotification("Oops!", "Failed to save track to Spotify.");
                     PlaySound(_ErrorSound);
-                    //string errorContent = await saveResponse.Content.ReadAsStringAsync();
-                    //Debug.WriteLine($"Error: {errorContent}");
+                    LogManager.WriteLog($"Failed to save track. Status code: {saveResponse.StatusCode}");
+                    string errorContent = await saveResponse.Content.ReadAsStringAsync();
+                    LogManager.WriteLog($"Error: {errorContent}");
                 }
             }
         }
         catch (Exception ex)
         {
-            //Debug.WriteLine($"Error: {ex.Message}");
+            ShowNotification("Oops!", "Failed to save track to Spotify.");
+            PlaySound(_ErrorSound);
+            LogManager.WriteLog($"Error: {ex.Message}");
             if (ex.InnerException != null)
             {
-                ShowNotification("Oops!", "Failed to save track to Spotify.");
-                PlaySound(_ErrorSound);
-                //Debug.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+                LogManager.WriteLog($"Inner Exception: {ex.InnerException.Message}");
             }
         }
+
+        LogManager.WriteLog("Exit SaveTrackAsync");
     }
 
     private async Task RemoveTrackAsync()
     {
         try
         {
+            LogManager.WriteLog("Enter RemoveTrackAsync");
+
             var track = await GetCurrentlyPlayingTrack();
             if (track == null)
             {
                 ShowNotification("Oops!", "No track is currently playing.");
                 PlaySound(_ErrorSound);
+                LogManager.WriteLog("track returned null");
                 return;
             }
 
@@ -382,6 +410,7 @@ public class SpotifyHotkeyManager : IDisposable
 
                 if (saveResponse.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
+                    LogManager.WriteLog("Unauthorized, refreshing token");
                     await RefreshAccessTokenAsync();
                     httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
                     saveResponse = await httpClient.DeleteAsync($"https://api.spotify.com/v1/me/tracks?ids={track.trackId}");
@@ -391,49 +420,59 @@ public class SpotifyHotkeyManager : IDisposable
                 {
                     ShowNotification($"Unliked Song", $"'{track.trackName}' by {track.artistNames}");
                     PlaySound(_UnlikeSongSound);
+                    LogManager.WriteLog($"Successfully removed '{track.trackName}' by {track.artistNames} from your library");
                 }
                 else
                 {
-                    //Debug.WriteLine($"Failed to save track. Status code: {saveResponse.StatusCode}");
                     ShowNotification("Oops!", "Failed to remove track from Spotify.");
                     PlaySound(_ErrorSound);
-                    //string errorContent = await saveResponse.Content.ReadAsStringAsync();
-                    //Debug.WriteLine($"Error: {errorContent}");
+                    LogManager.WriteLog($"Failed to remove track. Status code: {saveResponse.StatusCode}");
+                    string errorContent = await saveResponse.Content.ReadAsStringAsync();
+                    LogManager.WriteLog($"Error: {errorContent}");
                 }
             }
         }
         catch (Exception ex)
         {
-            //Debug.WriteLine($"Error: {ex.Message}");
+            ShowNotification("Oops!", "Failed to remove track from Spotify.");
+            PlaySound(_ErrorSound);
+            LogManager.WriteLog($"Error: {ex.Message}");
             if (ex.InnerException != null)
             {
-                ShowNotification("Oops!", "Failed to remove track from Spotify.");
-                PlaySound(_ErrorSound);
-                //Debug.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+                LogManager.WriteLog($"Inner Exception: {ex.InnerException.Message}");
             }
         }
+
+        LogManager.WriteLog("Exit RemoveTrackAsync");
     }
 
     private async Task RefreshTokenIfNeededAsync()
     {
+
+        LogManager.WriteLog("Enter RefreshTokenIfNeededAsync");
+
         if (_tokenExpirationTime <= DateTime.UtcNow.AddMinutes(5)) // 5-minute buffer
         {
             await RefreshAccessTokenAsync();
         }
+
+        LogManager.WriteLog("Exit RefreshTokenIfNeededAsync");
     }
 
     private async Task RefreshAccessTokenAsync()
     {
         try
         {
+            LogManager.WriteLog("Enter RefreshAccessTokenAsync");
+
             using (var httpClient = new HttpClient())
             {
                 var requestBody = new FormUrlEncodedContent(new[]
                 {
-                new KeyValuePair<string, string>("client_id", _clientId),
-                new KeyValuePair<string, string>("grant_type", "refresh_token"),
-                new KeyValuePair<string, string>("refresh_token", _refreshToken)
-            });
+                    new KeyValuePair<string, string>("client_id", _clientId),
+                    new KeyValuePair<string, string>("grant_type", "refresh_token"),
+                    new KeyValuePair<string, string>("refresh_token", _refreshToken)
+                });
 
                 var response = await httpClient.PostAsync("https://accounts.spotify.com/api/token", requestBody);
                 var content = await response.Content.ReadAsStringAsync();
@@ -450,27 +489,42 @@ public class SpotifyHotkeyManager : IDisposable
                     SpotifyLikeButtonSettings.Default.TokenExpirationTime = _tokenExpirationTime;
                     SpotifyLikeButtonSettings.Default.RefreshToken = _refreshToken;
                     SpotifyLikeButtonSettings.Default.Save();
+
+                    LogManager.WriteLog("Successfully refreshed Spotify token");
+                    LogManager.WriteLog($"Access Token: {_accessToken}");
+                    LogManager.WriteLog($"New token expiration time: {_tokenExpirationTime}");                    
+                    LogManager.WriteLog($"Refresh Token: {_refreshToken}");
                 }
                 else
                 {
-                    //Debug.WriteLine($"Failed to refresh token. Status code: {response.StatusCode}");
-                    //Debug.WriteLine($"Error: {content}");
                     ShowNotification("Oops!", "Failed to refresh Spotify token.");
                     PlaySound(_ErrorSound);
+
+                    LogManager.WriteLog($"Failed to refresh token. Status code: {response.StatusCode}");
+                    LogManager.WriteLog($"Response content: {content}");
                 }
             }
         }
         catch (Exception ex)
         {
-            //Debug.WriteLine($"Error refreshing token: {ex.Message}");
+            LogManager.WriteLog($"Error refreshing token: {ex.Message}");
+            if (ex.InnerException != null)
+            {
+                LogManager.WriteLog($"Inner Exception: {ex.InnerException.Message}");
+            }
         }
+        
+        LogManager.WriteLog("Exit RefreshTokenAsync");
     }
 
     // Show a notification to the user
     private void ShowNotification(string title, string message)
     {
+        LogManager.WriteLog($"Enter ShowNotification: {title} - {message}");
+
         if (SpotifyLikeButtonSettings.Default.ShowNotifications == false)
         {
+            LogManager.WriteLog("Notifications are disabled. Exit ShowNotification");
             return;
         }
 
@@ -499,7 +553,9 @@ public class SpotifyHotkeyManager : IDisposable
             notification.Dispose();
             timer.Dispose();
         }, null, 3000, System.Threading.Timeout.Infinite);
-    }
+     
+        LogManager.WriteLog("Exit ShowNotification");
+    }    
 }
 
 

@@ -45,6 +45,7 @@ namespace SpotifyLikeButton
             Label lblErrorSound;
             Label lblRunAtStartup;
             Label lblShowNotifications;
+            Label lblEnableLogging;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SettingsForm));
             lblLikeSong = new Label();
             lblLikeSound = new Label();
@@ -62,11 +63,14 @@ namespace SpotifyLikeButton
             btnChangeStartupStatus = new Button();
             btnChangeNotificationStatus = new Button();
             lblNotificationStatus = new Label();
+            btnChangeLoggingStatus = new Button();
+            lblLoggingStatus = new Label();
             lblUnlikeSong = new Label();
             lblUnlikeSound = new Label();
             lblErrorSound = new Label();
             lblRunAtStartup = new Label();
             lblShowNotifications = new Label();
+            lblEnableLogging = new Label();
             SuspendLayout();
             // 
             // lblUnlikeSong
@@ -358,13 +362,56 @@ namespace SpotifyLikeButton
             lblNotificationStatus.TabIndex = 19;
             lblNotificationStatus.Text = "Disabled";
             // 
+            // btnChangeLoggingStatus
+            // 
+            btnChangeLoggingStatus.BackColor = SystemColors.ActiveCaptionText;
+            btnChangeLoggingStatus.Font = new Font("Consolas", 11F, FontStyle.Bold);
+            btnChangeLoggingStatus.ForeColor = Color.FromArgb(51, 204, 102);
+            btnChangeLoggingStatus.Location = new Point(474, 306);
+            btnChangeLoggingStatus.Margin = new Padding(2);
+            btnChangeLoggingStatus.Name = "btnChangeLoggingStatus";
+            btnChangeLoggingStatus.Size = new Size(88, 32);
+            btnChangeLoggingStatus.TabIndex = 23;
+            btnChangeLoggingStatus.Text = "Enable";
+            btnChangeLoggingStatus.UseVisualStyleBackColor = false;
+            btnChangeLoggingStatus.Click += btnChangeLoggingStatus_Click;
+            // 
+            // lblLoggingStatus
+            // 
+            lblLoggingStatus.AutoSize = true;
+            lblLoggingStatus.BackColor = Color.Transparent;
+            lblLoggingStatus.Font = new Font("Consolas", 11F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblLoggingStatus.ForeColor = Color.FromArgb(51, 204, 102);
+            lblLoggingStatus.Location = new Point(233, 313);
+            lblLoggingStatus.Margin = new Padding(2, 0, 2, 0);
+            lblLoggingStatus.Name = "lblLoggingStatus";
+            lblLoggingStatus.Size = new Size(72, 18);
+            lblLoggingStatus.TabIndex = 22;
+            lblLoggingStatus.Text = "Disabled";
+            // 
+            // lblEnableLogging
+            // 
+            lblEnableLogging.AutoSize = true;
+            lblEnableLogging.BackColor = Color.Transparent;
+            lblEnableLogging.Font = new Font("Consolas", 11F, FontStyle.Bold);
+            lblEnableLogging.ForeColor = Color.FromArgb(51, 204, 102);
+            lblEnableLogging.Location = new Point(28, 313);
+            lblEnableLogging.Margin = new Padding(2, 0, 2, 0);
+            lblEnableLogging.Name = "lblEnableLogging";
+            lblEnableLogging.Size = new Size(128, 18);
+            lblEnableLogging.TabIndex = 21;
+            lblEnableLogging.Text = "Enable Logging:";
+            // 
             // SettingsForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             AutoValidate = AutoValidate.EnableAllowFocusChange;
             BackColor = SystemColors.ActiveCaptionText;
-            ClientSize = new Size(588, 318);
+            ClientSize = new Size(588, 356);
+            Controls.Add(btnChangeLoggingStatus);
+            Controls.Add(lblLoggingStatus);
+            Controls.Add(lblEnableLogging);
             Controls.Add(btnChangeNotificationStatus);
             Controls.Add(lblNotificationStatus);
             Controls.Add(lblShowNotifications);
@@ -416,5 +463,7 @@ namespace SpotifyLikeButton
         private Button btnChangeStartupStatus;
         private Button btnChangeNotificationStatus;
         private Label lblNotificationStatus;
+        private Button btnChangeLoggingStatus;
+        private Label lblLoggingStatus;
     }
 }

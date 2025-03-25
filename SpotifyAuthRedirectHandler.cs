@@ -17,20 +17,22 @@ public class SpotifyAuthRedirectHandler
 
     public SpotifyAuthRedirectHandler(string clientId, string redirectUri, string scope)
     {
+        LogManager.WriteLog($"Init SpotifyAuthRedirectHandler ({clientId}, {redirectUri}, {scope})");
         _clientId = clientId;
         _redirectUri = redirectUri;
-        _scope = scope;
-        
+        _scope = scope;        
 
         // Validate that the redirect URI is a valid local URI for HttpListener
         if (!_redirectUri.StartsWith("http://localhost") && !_redirectUri.StartsWith("http://127.0.0.1"))
         {
+            LogManager.WriteLog($"Incorrect URI - Must Start with http://localhost or http://127.0.0.1");
             throw new ArgumentException("Redirect URI must be a local URI starting with http://localhost or http://127.0.0.1");
         }
     }
 
     public async Task<string> GetAuthorizationCodeAsync()
     {
+        LogManager.WriteLog("Enter GetAuthorizationCodeAsync");
         _authCodeTaskSource = new TaskCompletionSource<string>();
 
         // Start the HTTP listener
@@ -56,15 +58,18 @@ public class SpotifyAuthRedirectHandler
         string authorizationCode = await _authCodeTaskSource.Task;
         //Debug.WriteLine($"Authorization code received: {authorizationCode}");
 
+        LogManager.WriteLog("Exit GetAuthorizationCodeAsync");
         return authorizationCode;
     }
 
     public async Task<SpotifyTokenResponse> ExchangeCodeForTokenAsync(string authorizationCode)
     {
+        LogManager.WriteLog("Enter ExchangeCodeForTokenAsync");
         // Create a new instance of SpotifyPkceAuth with the same parameters
         var auth = new SpotifyPkceAuth(_clientId, _redirectUri, _scope);
         auth.SetCodeVerifier(_codeVerifier);
 
+        LogManager.WriteLog("Exit ExchangeCodeForTokenAsync");
         // Exchange the code for a token
         return await auth.RequestAccessTokenAsync(authorizationCode);
     }
@@ -73,6 +78,8 @@ public class SpotifyAuthRedirectHandler
     {
         try
         {
+            LogManager.WriteLog("Enter HandleRedirectResponse");
+
             var context = contextTask.Result;
             var request = context.Request;
             var response = context.Response;
@@ -83,14 +90,17 @@ public class SpotifyAuthRedirectHandler
 
             if (!string.IsNullOrEmpty(error))
             {
+                LogManager.WriteLog($"Listener Error: {error}");
                 _authCodeTaskSource.SetException(new Exception($"Authorization error: {error}"));
             }
             else if (string.IsNullOrEmpty(code))
             {
+                LogManager.WriteLog("Listener Error: no code received");
                 _authCodeTaskSource.SetException(new Exception("No authorization code received"));
             }
             else
             {
+                LogManager.WriteLog($"Listener Success: code received: {code}");
                 _authCodeTaskSource.SetResult(code);
             }
 
@@ -109,9 +119,15 @@ public class SpotifyAuthRedirectHandler
         }
         catch (Exception ex)
         {
-            //Debug.WriteLine($"Error handling redirect: {ex.Message}");
+            LogManager.WriteLog($"Error handling redirect: {ex.Message}");
             _authCodeTaskSource.SetException(ex);
+            if (ex.InnerException != null)
+            {
+                LogManager.WriteLog($"Inner exception: {ex.InnerException.Message}");
+            }
         }
+
+        LogManager.WriteLog("Exit HandleRedirectResponse");
     }
 
     // Helper method to open the default browser
@@ -119,6 +135,7 @@ public class SpotifyAuthRedirectHandler
     {
         try
         {
+            LogManager.WriteLog($"Opening browser with URL: {url}");
             Process.Start(url);
         }
         catch
@@ -126,21 +143,26 @@ public class SpotifyAuthRedirectHandler
             // Handle platform-specific browser launching
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
+                LogManager.WriteLog("Windows platform detected");
                 url = url.Replace("&", "^&");
                 Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
+                LogManager.WriteLog("Linux platform detected");
                 Process.Start("xdg-open", url);
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
+                LogManager.WriteLog("Mac platform detected");
                 Process.Start("open", url);
             }
             else
             {
+                LogManager.WriteLog("Could not open browser");
                 throw;
             }
         }
+        LogManager.WriteLog("Exit OpenBrowser");
     }
 }

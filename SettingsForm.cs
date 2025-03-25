@@ -30,7 +30,7 @@ namespace SpotifyLikeButton
             lblUnlikeHotkey.Text = SpotifyLikeButtonSettings.Default.UnlikeSongHotkey;
             PopulateComboBoxes();
 
-            if(SpotifyLikeButtonSettings.Default.LaunchOnStartup)
+            if (SpotifyLikeButtonSettings.Default.LaunchOnStartup)
             {
                 btnChangeStartupStatus.Text = "Disable";
                 lblStartupStatus.Text = "Enabled";
@@ -50,6 +50,17 @@ namespace SpotifyLikeButton
             {
                 btnChangeNotificationStatus.Text = "Enable";
                 lblNotificationStatus.Text = "Disabled";
+            }
+
+            if (SpotifyLikeButtonSettings.Default.EnableLogging)
+            {
+                btnChangeLoggingStatus.Text = "Disable";
+                lblLoggingStatus.Text = "Enabled";
+            }
+            else
+            {
+                btnChangeLoggingStatus.Text = "Enable";
+                lblLoggingStatus.Text = "Disabled";
             }
         }
 
@@ -336,6 +347,28 @@ namespace SpotifyLikeButton
                 SpotifyLikeButtonSettings.Default.Save();
                 btnChangeNotificationStatus.Text = "Disable";
                 lblNotificationStatus.Text = "Enabled";
+            }
+        }
+
+        private void btnChangeLoggingStatus_Click(object sender, EventArgs e)
+        {
+            if (SpotifyLikeButtonSettings.Default.EnableLogging)
+            {
+                LogManager.WriteLog("Logging disabled");
+                LogManager.ConfigureTraceListener(false);
+                SpotifyLikeButtonSettings.Default.EnableLogging = false;                
+                SpotifyLikeButtonSettings.Default.Save();
+                btnChangeLoggingStatus.Text = "Enable";
+                lblLoggingStatus.Text = "Disabled";
+            }
+            else
+            {
+                LogManager.ConfigureTraceListener(true);
+                SpotifyLikeButtonSettings.Default.EnableLogging = true;
+                SpotifyLikeButtonSettings.Default.Save();
+                LogManager.WriteLog("Logging enabled");
+                btnChangeLoggingStatus.Text = "Disable";
+                lblLoggingStatus.Text = "Enabled";                
             }
         }
     }
