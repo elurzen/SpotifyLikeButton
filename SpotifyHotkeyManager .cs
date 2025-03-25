@@ -45,8 +45,6 @@ public class SpotifyHotkeyManager : IDisposable
     private const int WM_KEYUP = 0x0101;
     private const int WM_SYSKEYDOWN = 0x0104;
     private const int WM_SYSKEYUP = 0x0105;
-    private const int VK_ZERO = 189;  //- or G5 Key
-    private const int VK_G4 = 48;  //- or G4 Key
     private const int VK_CONTROL = 162;   // Control key
     private const int VK_SHIFT = 160;     // Shift key
     private const int VK_ALT = 164;   // Alt key
