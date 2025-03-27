@@ -13,7 +13,8 @@ namespace SpotifyLikeButton
         {
             try
             {
-                string logDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs");
+                //string logDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs");
+                string logDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SpotifyLikeButton", "Logs");
                 string logFileName = $"SpotifyLikeButton_{DateTime.Now:yyyy-MM-dd-hh-mm-ss}.log";
                 return Path.Combine(logDirectory, logFileName);
             }

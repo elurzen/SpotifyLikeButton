@@ -138,6 +138,19 @@ namespace SpotifyLikeButton
             lblShowNotifications.TabIndex = 18;
             lblShowNotifications.Text = "Show Notifications:";
             // 
+            // lblEnableLogging
+            // 
+            lblEnableLogging.AutoSize = true;
+            lblEnableLogging.BackColor = Color.Transparent;
+            lblEnableLogging.Font = new Font("Consolas", 11F, FontStyle.Bold);
+            lblEnableLogging.ForeColor = Color.FromArgb(51, 204, 102);
+            lblEnableLogging.Location = new Point(28, 313);
+            lblEnableLogging.Margin = new Padding(2, 0, 2, 0);
+            lblEnableLogging.Name = "lblEnableLogging";
+            lblEnableLogging.Size = new Size(128, 18);
+            lblEnableLogging.TabIndex = 21;
+            lblEnableLogging.Text = "Enable Logging:";
+            // 
             // lblLikeSong
             // 
             lblLikeSong.AutoSize = true;
@@ -389,19 +402,6 @@ namespace SpotifyLikeButton
             lblLoggingStatus.TabIndex = 22;
             lblLoggingStatus.Text = "Disabled";
             // 
-            // lblEnableLogging
-            // 
-            lblEnableLogging.AutoSize = true;
-            lblEnableLogging.BackColor = Color.Transparent;
-            lblEnableLogging.Font = new Font("Consolas", 11F, FontStyle.Bold);
-            lblEnableLogging.ForeColor = Color.FromArgb(51, 204, 102);
-            lblEnableLogging.Location = new Point(28, 313);
-            lblEnableLogging.Margin = new Padding(2, 0, 2, 0);
-            lblEnableLogging.Name = "lblEnableLogging";
-            lblEnableLogging.Size = new Size(128, 18);
-            lblEnableLogging.TabIndex = 21;
-            lblEnableLogging.Text = "Enable Logging:";
-            // 
             // SettingsForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -433,11 +433,12 @@ namespace SpotifyLikeButton
             Controls.Add(lblLikeSound);
             Controls.Add(lblUnlikeSong);
             Controls.Add(lblLikeSong);
-            FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             HelpButton = true;
             Icon = (Icon)resources.GetObject("$this.Icon");
             KeyPreview = true;
             Margin = new Padding(2);
+            MaximizeBox = false;
             Name = "SettingsForm";
             Text = "Spotify Like Button Settings";
             Load += SettingsForm_Load;

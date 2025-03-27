@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\SpotifyLikeButtonIcon.ico</ApplicationIcon>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
@@ -9,7 +9,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationHighDpiMode>SystemAware</ApplicationHighDpiMode>
     <ForceDesignerDpiUnaware>true</ForceDesignerDpiUnaware>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\SpotifyLikeButtonIcon.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Update="SpotifyLikeButtonSettings.Designer.cs">
@@ -24,6 +29,10 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>SpotifyLikeButtonSettings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Logs\" />
   </ItemGroup>
 
 </Project>
