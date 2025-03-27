@@ -3,13 +3,14 @@
 
  Download the SpotifyLikeButtonSetup.msi from the Releases section and install the app. 
 
- After it installs, navigate to where you installed it and run the SpotifyLikeButton.exe.
+ After it installs, use the shortcut on your desktop or navigate to where you installed the app to run the SpotifyLikeButton.exe.
 
  A green plus icon will appear in your icon tray (click the arrow if you don't see it). You can double-click the icon or right-click > select "Settings" to open the settings menu. 
 
 <img width="57" alt="SpotifyLikeButtonTrayIcon" src="https://github.com/user-attachments/assets/b05e2d01-efdc-4731-a6f6-6f4b01e90405" />
  
-<img width="441" alt="SpotifyLikeButtonSettings" src="https://github.com/user-attachments/assets/ecfa3147-8357-430e-a376-346f4610de33" />
+<img width="440" alt="SpotifyLikeButtonSettings" src="https://github.com/user-attachments/assets/faf8d2af-6e41-4f5b-8a60-a61e5e71dc7b" />
+
 
  By default, you can Like songs with F4 and Unlike them with F8. Pressing "Like" when a song is already liked won't unlike it, you need to deliberately press the "Unlike" key.
 
@@ -23,5 +24,7 @@
  
  "Show Notifications" will display a Windows notification with the outcome of the action; it includes the song title and artist(s) as well. This is also disabled by default.
 
+ "Enable Logging" should be left disabled unless the logs are needed for troubleshooting with a developer. They are stored at C:\Users\[USERNAME]\AppData\Local\SpotifyLikeButton\Logs
 
-# The Spotify desktop and web players don't always update right away. If you receive a success sound or notification, it worked.
+
+# The Spotify desktop and web players don't always update right away. If you receive a success sound or notification, it worked. 
